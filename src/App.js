@@ -1,21 +1,10 @@
-import './App.css';
+import InputLabel from "./components/InputLabel";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p className='text-green-500'>
-          lmao all of them <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <p>Amazing people here</p>
+      <InputLabel />
     </div>
   );
 }

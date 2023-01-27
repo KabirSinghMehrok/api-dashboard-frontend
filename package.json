@@ -4,6 +4,7 @@
   "homepage": "https://kabirsinghmehrok.github.io/api-dashboard-frontend",
   "private": true,
   "dependencies": {
+    "@radix-ui/react-label": "^2.0.0",
     "@radix-ui/react-popover": "1.0.3",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
