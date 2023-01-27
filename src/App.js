@@ -1,10 +1,7 @@
-import InputLabel from "./components/InputLabel";
-
 function App() {
   return (
     <div>
-      <p>Amazing people here</p>
-      <InputLabel />
+      <p>API dashboard project by CoSyLab</p>
     </div>
   );
 }
