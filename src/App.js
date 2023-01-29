@@ -1,7 +1,9 @@
+import LoginPage from './pages/Login/LoginPage';
+
 function App() {
   return (
     <div>
-      <p>API dashboard project by CoSyLab</p>
+      <LoginPage />
     </div>
   );
 }
