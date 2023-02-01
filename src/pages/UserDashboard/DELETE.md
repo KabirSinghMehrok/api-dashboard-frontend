@@ -1,1 +1,0 @@
-Delete this file when folder has any other file in it
