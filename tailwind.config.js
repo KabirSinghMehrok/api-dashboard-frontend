@@ -5,10 +5,13 @@ module.exports = {
     "node_modules/flowbite-react/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: {
+        'signup': "url(assets/login_wallpaper.jpg)"
+      }
+    },
   },
   plugins: [
-    require("tailwindcss-radix")(),
     require('flowbite/plugin'),
   ],
 }
