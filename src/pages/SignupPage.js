@@ -24,7 +24,7 @@ const SignupPage = () => {
     try {
       const modifiedData = {...data};
       delete modifiedData['confirm_password']
-      console.log(modifiedData);
+      // console.log(modifiedData);
       
       setLoading(true); // to avoid multiple submission
       const response = await signup(modifiedData)

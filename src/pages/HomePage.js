@@ -34,7 +34,7 @@ const HomePage = () => {
                 Ganesh Bagler
               </span>
               <span className="block truncate text-sm font-medium">
-                bagler@iiitd.ac.in
+                {currentUser.email}
               </span>
             </Dropdown.Header>
             <Dropdown.Item>
@@ -71,7 +71,6 @@ const HomePage = () => {
           </Navbar.Link>
         </Navbar.Collapse>
       </Navbar>
-      {console.log(currentUser)}
     </>
   );
 }
