@@ -1,11 +1,10 @@
-// import React from 'react'
-import Signup from './pages/Signup/SignupPage'
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegsiterPage';
 
 function App() {
   return (
     <div>
-      <p>API dashboard project by CoSyLab</p>
-      <Signup />
+      <RegisterPage />
     </div>
   );
 }
