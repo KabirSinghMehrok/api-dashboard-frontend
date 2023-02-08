@@ -1,5 +1,5 @@
 import axios from "axios";
 
 export default axios.create({
-	baseURL: 'https://127.0.0.1:6969'
+	baseURL: 'https://ccd8cddb-4062-421f-b06b-367343ed6408.mock.pstmn.io'
 })

@@ -1,14 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Label, TextInput, Checkbox, Button, Alert } from 'flowbite-react';
 import { useForm } from 'react-hook-form';
-import AuthContext from '../context/AuthContext';
-import axios from '../api/axios';
+import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.jpeg';
+import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const {setAuth} = useContext(AuthContext);
+  const {login} = useAuth();
   const [success, setSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState('')
-  
+  const [submitError, setSubmitError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const { 
     register, 
     handleSubmit, 
@@ -18,17 +21,14 @@ const LoginPage = () => {
   
   const onSubmit = async (data) => {
     try {
-      console.log(data);
-      const response = axios.post('/login', JSON.stringify(data), 
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': '*'
-          },
-          withCredentials: true
-        }
-      );
+      // console.log(data);
+      
+      setLoading(true); // to avoid multiple submission
+      const response = await login(data)
+      setLoading(false);
+
       setSuccess(true);
+      navigate('/');
       reset();
     }
     catch (err) {
@@ -56,10 +56,11 @@ const LoginPage = () => {
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-signup bg-center">
       <div className='flex justify-center items-center w-screen h-screen backdrop-blur-sm'>
-        <div className='flex justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>
+        <div className='flex flex-col justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>
+        <img src={logo} className="w-24 mb-12"></img>
+
           <form className="flex flex-col gap-4 w-4/5" onSubmit={handleSubmit(onSubmit, onError)}>
             <div>
-              
               <div className="mb-2 block">
                 <Label
                   htmlFor="email1"
@@ -116,16 +117,15 @@ const LoginPage = () => {
               />
             </div>
             {console.log(submitError)}
-            {submitError !== '' ? 
-              (<Alert color="failure">
+            {submitError &&  
+              <Alert color="failure">
                 <span>
                   <span className="font-medium">
                     Info alert!
                   </span>
                   {' ' + submitError}.
                 </span>
-              </Alert>) :
-              null
+              </Alert>
             }
             <div className="flex items-center gap-2">
               <Checkbox id="remember" />
@@ -133,9 +133,20 @@ const LoginPage = () => {
                 Remember me
               </Label>
             </div>
-            <Button type="submit">
+
+            <Button type="submit" disabled={loading}>
               Submit
             </Button>
+
+            <Label className="mt-4 text-center">
+                Don't have an account?
+                <Link
+                  to="/signup"
+                  className="ml-1 text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Sign up
+                </Link>
+              </Label>
           </form>
         </div>
       </div>

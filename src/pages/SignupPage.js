@@ -1,14 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Label, TextInput, Checkbox, Button, Alert } from 'flowbite-react';
 import { useForm } from 'react-hook-form';
-import AuthContext from '../context/AuthContext';
-import axios from '../api/axios';
+import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.jpeg';
+import { useNavigate, Link } from "react-router-dom";
 
-const RegisterPage = () => {
-  const {setAuth} = useContext(AuthContext);
+const SignupPage = () => {
+  const {signup} = useAuth();
   const [success, setSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState('')
-  
+  const [submitError, setSubmitError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const { 
     register, 
     handleSubmit, 
@@ -19,17 +22,16 @@ const RegisterPage = () => {
   
   const onSubmit = async (data) => {
     try {
-      // console.log(data);
-      const response = axios.post('/register', JSON.stringify(data), 
-        {
-          headers: { 
-            'Content-Type': 'application/json', 
-            'Access-Control-Allow-Origin': '*'
-          },
-          withCredentials: true
-        }
-      );
+      const modifiedData = {...data};
+      delete modifiedData['confirm_password']
+      // console.log(modifiedData);
+      
+      setLoading(true); // to avoid multiple submission
+      const response = await signup(modifiedData)
+      setLoading(false);
+
       setSuccess(true);
+      navigate('/');
       reset();
     }
     catch (err) {
@@ -43,14 +45,13 @@ const RegisterPage = () => {
         setSubmitError('User unauthorized, please recheck credentials');
       }
       else {
-        setSubmitError('Unable to login, please try again');
+        setSubmitError('Unable to register, please try again');
       }
     }
   }
 
   const onError = async () => {
-    // this is triggered whenever there is some sort of error
-    // console.log("Func: onError, File: RegisterPage.js")
+    console.log("Func: onError, FIle: SignupPage.js")
   }
 
   // console.log(errors);
@@ -58,7 +59,8 @@ const RegisterPage = () => {
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-signup bg-center">
       <div className='flex justify-center items-center w-screen h-screen backdrop-blur-sm'>
-        <div className='flex justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>
+        <div className='flex flex-col justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>
+          <img src={logo} className="w-24 mb-12"></img>
           <form className="flex flex-col gap-4 w-4/5" onSubmit={handleSubmit(onSubmit, onError)}>
             
             {/* Email */}
@@ -175,9 +177,19 @@ const RegisterPage = () => {
               </Label>
             </div>
             
-            <Button type="submit">
+            <Button type="submit" disabled={loading}>
               Submit
             </Button>
+            
+            <Label className="mt-4 text-center">
+                Already have an account?
+                <Link
+                  to="/login"
+                  className="ml-1 text-blue-600 hover:underline dark:text-blue-500"
+                >
+                  Log in
+                </Link>
+              </Label>
           </form>
         </div>
       </div>
@@ -185,4 +197,4 @@ const RegisterPage = () => {
   );
 }
 
-export default RegisterPage;
+export default SignupPage;
