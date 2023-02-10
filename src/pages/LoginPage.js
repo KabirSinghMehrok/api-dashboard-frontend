@@ -4,9 +4,7 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpeg';
 import { useNavigate, Link } from "react-router-dom";
-import LoginOAuth from '../components/loginOAuth';
 import { useEffect } from 'react';
-import { gapi } from 'gapi-script';
 
 // for GoogeOAuth
 const clientId = "991312066352-4sh6kvg5rc91cbu54kn8hpclss7nlq39.apps.googleusercontent.com";
@@ -18,16 +16,22 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    function start(){
-      gapi.client.init({
-        clientId: clientId,
-        scope: ""
-      })
-    };
+  function handleCallbackResoonse(response){
+    console.log("encoded JWT token from GoogleOAuth: " + response.credential);
+  }
 
-    gapi.load('client:auth2', start);
-  });
+  useEffect(() => {
+    /* global google */
+    google.accounts.id.initialize({
+      clientId: clientId,
+      callback: handleCallbackResoonse
+    });
+
+    google.accounts.id.renderButton(
+      document.getElementById("loginOAuth"),
+      {theme: "outline", size: "large"}
+    );
+  }, []);
 
   const { 
     register, 
@@ -77,7 +81,6 @@ const LoginPage = () => {
         <img src={logo} className="w-24 mb-12"></img>
           <form className="flex flex-col gap-4 w-4/5" onSubmit={handleSubmit(onSubmit, onError)}>
             <div>
-              <LoginOAuth />
               <div className="mb-2 block">
                 <Label
                   htmlFor="email1"
@@ -154,6 +157,8 @@ const LoginPage = () => {
             <Button type="submit" disabled={loading}>
               Submit
             </Button>
+
+            <div id="loginOAuth"></div>
 
             <Label className="mt-4 text-center">
                 Don't have an account?
