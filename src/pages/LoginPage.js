@@ -4,6 +4,12 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
 import logo from '../assets/logo.jpeg';
 import { useNavigate, Link } from "react-router-dom";
+import LoginOAuth from '../components/loginOAuth';
+import { useEffect } from 'react';
+import { gapi } from 'gapi-script';
+
+// for GoogeOAuth
+const clientId = "991312066352-4sh6kvg5rc91cbu54kn8hpclss7nlq39.apps.googleusercontent.com";
 
 const LoginPage = () => {
   const {login} = useAuth();
@@ -11,6 +17,17 @@ const LoginPage = () => {
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    function start(){
+      gapi.client.init({
+        clientId: clientId,
+        scope: ""
+      })
+    };
+
+    gapi.load('client:auth2', start);
+  });
 
   const { 
     register, 
@@ -56,11 +73,11 @@ const LoginPage = () => {
   return (
     <div className="flex justify-center items-center w-screen h-screen bg-signup bg-center">
       <div className='flex justify-center items-center w-screen h-screen backdrop-blur-sm'>
-        <div className='flex flex-col justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>
+        <div className='flex flex-col justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>        
         <img src={logo} className="w-24 mb-12"></img>
-
           <form className="flex flex-col gap-4 w-4/5" onSubmit={handleSubmit(onSubmit, onError)}>
             <div>
+              <LoginOAuth />
               <div className="mb-2 block">
                 <Label
                   htmlFor="email1"
