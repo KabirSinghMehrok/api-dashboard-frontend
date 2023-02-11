@@ -23,7 +23,7 @@ const LoginPage = () => {
   useEffect(() => {
     /* global google */
     google.accounts.id.initialize({
-      clientId: clientId,
+      client_id: clientId,
       callback: handleCallbackResoonse
     });
 
