@@ -1,16 +1,22 @@
 import { Routes, Route } from "react-router-dom"
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
-import HomePage from './pages/HomePage'
+import UserDashboard from './pages/UserDashboard'
+import AdminDashboard from './pages/AdminDashboard'
 import PrivateRoute from "./components/PrivateRoute";
+import LandingPage from "./pages/LandingPage";
+import { useAuth } from "./context/AuthContext";
+import { useEffect } from "react";
 
 function App() {
   return (
-    <div>
+    <div className="h-screen">
       <Routes>
         <Route element={<PrivateRoute/>}>
-          <Route path="/" element={ <HomePage/> } exact/>
+          <Route path="dashboard" element={ <UserDashboard/> } exact/>
+          <Route path="admin" element={ <AdminDashboard/> } exact/>
         </Route>
+        <Route path="/" element={ <LandingPage/> } />
         <Route path="login" element={ <LoginPage/> } />
         <Route path="signup" element={ <SignupPage/> } />
       </Routes>

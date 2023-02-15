@@ -24,14 +24,14 @@ const SignupPage = () => {
     try {
       const modifiedData = {...data};
       delete modifiedData['confirm_password']
-      // console.log(modifiedData);
+      console.log(modifiedData);
       
       setLoading(true); // to avoid multiple submission
       const response = await signup(modifiedData)
       setLoading(false);
 
       setSuccess(true);
-      navigate('/');
+      navigate('/dashboard');
       reset();
     }
     catch (err) {
@@ -194,7 +194,7 @@ const SignupPage = () => {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default SignupPage;

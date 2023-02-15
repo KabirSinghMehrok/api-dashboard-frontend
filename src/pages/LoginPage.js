@@ -28,7 +28,7 @@ const LoginPage = () => {
       setLoading(false);
 
       setSuccess(true);
-      navigate('/');
+      navigate('/dashboard');
       reset();
     }
     catch (err) {
@@ -116,7 +116,7 @@ const LoginPage = () => {
                 )}
               />
             </div>
-            {console.log(submitError)}
+            {/* {console.log(submitError)} */}
             {submitError &&  
               <Alert color="failure">
                 <span>
@@ -151,7 +151,7 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default LoginPage;

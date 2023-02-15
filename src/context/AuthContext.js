@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useEffect } from 'react';
 import axios from '../api/axios';
 
 const AuthContext = createContext({});
@@ -7,34 +7,11 @@ export function useAuth() {
 	return useContext(AuthContext);
 }
 
-
 export function AuthProvider({ children }) {
-	const [currentUser, setCurrentUser] = useState({})
-	
+	const [currentUser, setCurrentUser] = useState()
+
 	async function login(data) {
 		const response = await axios.post('/login', JSON.stringify(data), 
-			{
-				headers: { 
-					'Content-Type': 'application/json', 
-					'Access-Control-Allow-Origin': '*'
-				},
-				withCredentials: true
-			}
-		)
-
-		setCurrentUser({ 
-			userName: response.data.userName,
-			profilePic: response.data.profilePic,  
-			email: data.email, 
-			token: response.data.token,
-		})
-
-		return response;
-	}
-
-
-	async function signup(data) {
-		const response = await axios.post('/register', JSON.stringify(data), 
 			{
 				headers: { 
 					'Content-Type': 'application/json', 
@@ -44,19 +21,41 @@ export function AuthProvider({ children }) {
 			}
 		)
 
-		setCurrentUser({ 
-			userName: response.data.userName,
-			profilePic: response.data.profilePic,  
-			email: data.email, 
-			token: response.data.token,
-		})
-		
+		storeToken(response.data.token)
+		setCurrentUser({token: getToken()})
 		return response;
 	}
 
 
-	function logout() {
+	async function signup(data) {
+		const response = await axios.post('/register', JSON.stringify(data), 
+			{
+				headers: { 
+					'Content-Type': 'application/json', 
+					'Access-Control-Allow-Origin': "*"
+				},
+				// withCredentials: true
+			}
+		)
 
+		storeToken(response.data.token)
+		setCurrentUser({token: getToken()})
+		return response;
+	}
+
+	function storeToken(token) {
+		localStorage.setItem("jwtToken", token);
+	}
+	
+	// Retrieve JWT from local storage
+	function getToken() {
+		const returnVal = localStorage.getItem("jwtToken");
+		console.log(`haiyaaa ${returnVal}`);
+		return returnVal ? returnVal : 0;
+	}
+
+	function logout() {
+		localStorage.removeItem("jwtToken");
 	}
 
 
@@ -72,6 +71,8 @@ export function AuthProvider({ children }) {
 
 	let value = {
 		currentUser,
+		setCurrentUser,
+		getToken,
 		login,
 		logout,
 		signup,
