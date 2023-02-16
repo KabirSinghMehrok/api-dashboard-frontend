@@ -79,7 +79,7 @@ const LoginPage = () => {
       <div className='flex justify-center items-center w-screen h-screen backdrop-blur-sm'>
         <div className='flex flex-col justify-center items-center bg-white w-96 py-8 rounded-lg shadow-lg'>        
         <img src={logo} className="w-24 mb-12"></img>
-          <form className="flex flex-col gap-4 w-4/5" onSubmit={handleSubmit(onSubmit, onError)}>
+          <form className="flex flex-col gap-4 w-4/5 pb-5" onSubmit={handleSubmit(onSubmit, onError)}>
             <div>
               <div className="mb-2 block">
                 <Label
@@ -158,7 +158,7 @@ const LoginPage = () => {
               Submit
             </Button>
 
-            <div id="loginOAuth"></div>
+            {/* <div id="loginOAuth"></div> */}
 
             <Label className="mt-4 text-center">
                 Don't have an account?
@@ -170,6 +170,8 @@ const LoginPage = () => {
                 </Link>
               </Label>
           </form>
+
+          <div id="loginOAuth"></div>
         </div>
       </div>
     </div>
