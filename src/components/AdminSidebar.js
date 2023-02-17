@@ -1,7 +1,7 @@
 import React from 'react'
 import { Sidebar } from 'flowbite-react';
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ apiList, handleFetchApiUsers }) {
 	return (
 		<div className="w-fit h-full border-r-2">
 			<Sidebar 
@@ -9,21 +9,20 @@ export default function AdminSidebar() {
 			>
 				<Sidebar.Items>
 					<Sidebar.ItemGroup>
-						<Sidebar.Item
-							href="#"
-						>
+						<Sidebar.Item onClick={() => handleFetchApiUsers("showUserList")}>
 							Users
 						</Sidebar.Item>
 						<Sidebar.Collapse
 							
 							label="API's"
 						>
-							<Sidebar.Item href="#">
-								SomeAPI
-							</Sidebar.Item>
-							<Sidebar.Item href="#">
-								AnotherAPI
-							</Sidebar.Item>
+							{
+								apiList.map(api => (
+									<Sidebar.Item key={api._id} onClick={() => handleFetchApiUsers(api)}>
+										{api.name}
+									</Sidebar.Item>
+								))
+							}
 						</Sidebar.Collapse>
 					</Sidebar.ItemGroup>
 				</Sidebar.Items>

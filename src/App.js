@@ -7,13 +7,18 @@ import PrivateRoute from "./components/PrivateRoute";
 import LandingPage from "./pages/LandingPage";
 import { useAuth } from "./context/AuthContext";
 import { useEffect } from "react";
+import { createBrowserHistory } from 'history';
+
+export const history = createBrowserHistory({
+  basename: process.env.PUBLIC_URL
+});
 
 function App() {
   return (
     <div className="h-screen">
       <Routes>
         <Route element={<PrivateRoute/>}>
-          <Route path="dashboard" element={ <UserDashboard/> } exact/>
+          <Route path="user" element={ <UserDashboard/> } exact/>
           <Route path="admin" element={ <AdminDashboard/> } exact/>
         </Route>
         <Route path="/" element={ <LandingPage/> } />

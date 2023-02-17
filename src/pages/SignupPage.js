@@ -31,7 +31,7 @@ const SignupPage = () => {
       setLoading(false);
 
       setSuccess(true);
-      navigate('/dashboard');
+      navigate('/user');
       reset();
     }
     catch (err) {
