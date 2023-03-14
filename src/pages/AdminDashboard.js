@@ -6,7 +6,7 @@ import UsersList from '../components/UsersList';
 import ApiUsersList from '../components/ApiUsersList';
 import axios from '../api/axios';
 import { useNavigate } from "react-router-dom";
-import DUMMY_API_DATA from '../json/DUMMY_API_DATA.json';
+// import DUMMY_API_DATA from '../json/DUMMY_API_DATA.json';
 
 const AdminDashboard = () => {
   const [showApiList, setShowApiList] = useState(false)
