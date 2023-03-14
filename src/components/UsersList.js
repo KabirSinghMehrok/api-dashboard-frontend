@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button } from 'flowbite-react';
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from "react-router-dom";
 import axios from '../api/axios';
 
 export default function UsersList() {
 	const [users, setUsers] = useState([])
-	const { getToken, devLogin } = useAuth();
+	const { getToken, getProfile, logout } = useAuth();
+	const navigate = useNavigate();
+	const userInfo = getProfile();
 
 	const fetchUsers = async () => {
 		const token = await getToken()
@@ -17,9 +20,8 @@ export default function UsersList() {
 			}
 		).catch(async error => 
 			{
-				if (error.response.status === 401 || error.response.status === 400) {
-					await devLogin();
-					fetchUsers();
+				if (error.response.status === 401) {
+					logout();
 				}
 			}  
 		);
@@ -27,9 +29,9 @@ export default function UsersList() {
 	};
 
 
-	const makeModerator = function (userID) {
+	const manageModerator = async function (userID, isMod) {
 		try { 
-			const makeMod = async () => {
+			const manageMod = async () => {
 				const token = await getToken()
 				const result = await axios.patch(`/users/${userID}`, 
 					{
@@ -37,20 +39,19 @@ export default function UsersList() {
 						'Authorization': `Bearer ${token}`
 						},
 						data: {
-							'isModerator': 'MODERATOR'
+							'isModerator': isMod
 						}
 					}
 				).catch(async error => 
           {
-            if (error.response.status === 401 || error.response.status === 400) {
-							await devLogin();
-							makeMod();
+            if (error.response.status === 401) {
+							logout();
             }
           }  
         );
 			};
-			makeMod();
-			fetchUsers();				// after successfully making moderator
+			await manageMod();
+			await fetchUsers();				// after successfully making moderator
 		}
 		catch {
 			console.log("ERROR: While making moderator")
@@ -70,9 +71,8 @@ export default function UsersList() {
 					}
 				).catch(async error => 
           {
-            if (error.response.status === 401 || error.response.status === 400) {
-							await devLogin();
-							deleteUsr();
+            if (error.response.status === 401) {
+							logout();
             }
           }  
         );
@@ -160,21 +160,24 @@ export default function UsersList() {
 										>
 											Edit
 										</Button>
-										{	!user.isAdmin &&
+										{	('isAdmin' in userInfo) && !('isAdmin' in user) &&
 											<Button 
 												size="sm" color="light"
-												onClick={() => makeModerator(user._id)} 
+												onClick={() => manageModerator(user._id, !user.isModerator)} 
 												className="border-2 border-orange-600 text-orange-600 hover:text-white hover:bg-orange-600 " 
 											>
-												Make Moderator
+												{user.isModerator ? 'Remove Moderator' : 'Make Moderator'}
 											</Button>
 										}
-										<Button 
-											size="sm" color="light" 
-											className="border-2 border-red-700 text-red-700 hover:text-white hover:bg-red-700 " 
-										>
-											Delete User
-										</Button>
+										{ (('isAdmin' in userInfo) || userInfo.isModerator) && !('isAdmin' in user) 
+											&& !(userInfo.isModerator && user.isModerator) &&
+											<Button 
+												size="sm" color="light" 
+												className="border-2 border-red-700 text-red-700 hover:text-white hover:bg-red-700 " 
+											>
+												Delete User
+											</Button>
+										}
 									</div>
 								</Table.Cell>
 							</Table.Row>

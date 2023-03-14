@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext';
+import { useNavigate } from "react-router-dom";
 import { Table, Button } from 'flowbite-react';
 import axios from '../api/axios';
 
-export default function ApiUsersList({ apiName, apiUserData, apiID }) {
-	const { getToken, devLogin } = useAuth();
+export default function ApiUsersList({apiName, apiUserData, apiID}) {
+	const { getToken, logout } = useAuth();
 
 	// useEffect(() => {
 	// 	// console.log("Fetching of user data happening")
@@ -67,7 +68,7 @@ export default function ApiUsersList({ apiName, apiUserData, apiID }) {
 	// 	}
 	// }, [rawData])
 
-	console.log(apiUserData);
+	// console.log(apiUserData);
 	
 	const unsubscribe = function (userID, subID, apiName) {
 		try {
@@ -85,9 +86,9 @@ export default function ApiUsersList({ apiName, apiUserData, apiID }) {
           }
         ).catch(async error => 
           {
-            if (error.response.status === 401 || error.response.status === 400) {
-              await devLogin();
-              unsub();
+            if (error.response.status === 401) {
+              // Unauthorized, token invalid
+							logout();
             }
           }  
         );

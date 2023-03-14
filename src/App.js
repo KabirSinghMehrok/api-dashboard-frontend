@@ -5,6 +5,7 @@ import UserDashboard from './pages/UserDashboard'
 import AdminDashboard from './pages/AdminDashboard'
 import PrivateRoute from "./components/PrivateRoute";
 import LandingPage from "./pages/LandingPage";
+import NotFound from "./pages/NotFound";
 import { useAuth } from "./context/AuthContext";
 import { useEffect } from "react";
 import { createBrowserHistory } from 'history';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={ <LandingPage/> } />
         <Route path="login" element={ <LoginPage/> } />
         <Route path="signup" element={ <SignupPage/> } />
+        <Route path="*" element={<NotFound/>} />
       </Routes>
     </div>
   );

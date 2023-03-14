@@ -1,11 +1,12 @@
 import React from 'react'
-import { Navbar, Dropdown, Avatar, Button } from 'flowbite-react';
+import { Navbar, Dropdown, Avatar, Button, Badge } from 'flowbite-react';
 import logo from '../assets/logo.jpeg'
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 
 export default function Navigation() {
-  const {currentUser, logout} = useAuth();
+  const {getProfile, logout} = useAuth();
+  const userInfo = getProfile();
 
 	return (
 		<Navbar
@@ -24,8 +25,25 @@ export default function Navigation() {
           </span>
         </Navbar.Brand>
         {
-          currentUser 
-          ? <div className="flex md:order-2">
+          userInfo 
+          ? <div className="flex items-center gap-4 md:order-2">
+              { (('isAdmin' in userInfo) || userInfo.isModerator) &&
+                <Badge
+                  color={
+                    ( () => {
+                      if ('isAdmin' in userInfo) return 'purple';
+                      if (userInfo.isModerator) return 'pink';
+                    })()
+                  }
+                  size="lg"
+                >
+                  {( () => {
+                      if ('isAdmin' in userInfo) return 'Admin';
+                      if (userInfo.isModerator) return 'Moderator';
+                    } )()
+                  }
+                </Badge>
+              }
               <Dropdown
                 arrowIcon={false}
                 inline={true}
@@ -33,7 +51,7 @@ export default function Navigation() {
               >
                 <Dropdown.Header>
                   <span className="block truncate text-sm font-medium">
-                    {currentUser.email}
+                    {userInfo.email}
                   </span>
                 </Dropdown.Header>
                 <Dropdown.Item>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Label, TextInput, Checkbox, Button, Alert } from 'flowbite-react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../context/AuthContext';
@@ -6,7 +6,7 @@ import logo from '../assets/logo.jpeg';
 import { useNavigate, Link } from "react-router-dom";
 
 const LoginPage = () => {
-  const {login} = useAuth();
+  const {login, getProfile} = useAuth();
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,19 +19,30 @@ const LoginPage = () => {
     reset
   } = useForm();
   
+
+  const navigateAccordingToRole = () => {
+    const userInfo = getProfile();
+    navigate(
+      (() => {
+        if ('isAdmin' in userInfo) return '/admin';
+        if (userInfo.isModerator) return '/admin';
+        return '/user';
+      })()
+    )
+  }
+
   const onSubmit = async (data) => {
     try {
       // console.log(data);
-      
       setLoading(true); // to avoid multiple submission
-      const response = await login(data)
+      const response = await login(data);
       setLoading(false);
-
       setSuccess(true);
-      navigate('/user');
       reset();
+      navigateAccordingToRole();
     }
     catch (err) {
+      console.log(err);
       if (!err?.response) {
         setSubmitError('No response from server');
       }
@@ -50,6 +61,14 @@ const LoginPage = () => {
   const onError = async () => {
     console.log("Func: onError, FIle: LoginPage.js")
   }
+
+  useEffect (() => {
+    // if user is previously logged in
+    // navigate them back according to role
+    if (getProfile()) {
+      navigateAccordingToRole();
+    }
+  }, [])
 
   // console.log(errors);
   
@@ -111,7 +130,7 @@ const LoginPage = () => {
                 {...register("password", 
                   {
                     required: true, 
-                    minLength: 8
+                    minLength: 6
                   }
                 )}
               />

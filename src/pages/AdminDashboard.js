@@ -5,19 +5,28 @@ import AdminSidebar from '../components/AdminSidebar';
 import UsersList from '../components/UsersList';
 import ApiUsersList from '../components/ApiUsersList';
 import axios from '../api/axios';
+import { useNavigate } from "react-router-dom";
 import DUMMY_API_DATA from '../json/DUMMY_API_DATA.json';
 
 const AdminDashboard = () => {
   const [showApiList, setShowApiList] = useState(false)
   const [apiUserData, setApiUserData] = useState([])
   const [apiList, setApiList] = useState([]);
-  const { getToken, devLogin } = useAuth();
+  const { getToken, getProfile, logout } = useAuth();
+  const navigate = useNavigate();
+  const userInfo = getProfile();
 
 
   useEffect(() => {
     // fetch the list of API's
     // store the response in array and pass to AdminSidebar
     try {
+      // check if person is an admin/moderator or not
+      // don't let access page otherwise
+      if (!userInfo.isModerator) {
+        navigate('/user')
+      }
+
       const fetchApi = async () => {
         const result = await axios.get('/apis');
         setApiList(result.data.apis);
@@ -48,9 +57,8 @@ const AdminDashboard = () => {
           }
         ).catch(async error => 
           {
-            if (error.response.status === 401 || error.response.status === 400) {
-              await devLogin();
-              fetchApiUserData();
+            if (error.response.status === 401) {
+              logout();
             }
           }  
         );
