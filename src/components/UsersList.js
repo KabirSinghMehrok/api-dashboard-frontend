@@ -1,61 +1,100 @@
 import React, { useState, useEffect } from 'react'
 import { Table, Button } from 'flowbite-react';
-import DUMMY_USER_DATA from '../json/DUMMY_USER_DATA.json'
+import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 
 export default function UsersList() {
-	const [rawData, setRawData] = useState({})
-	let refinedData = Object.values(DUMMY_USER_DATA)
-	console.log(refinedData);
-	const token = "DUMMY_TOKEN"
-	
+	const [users, setUsers] = useState([])
+	const { getToken, devLogin } = useAuth();
 
-	useEffect(() => {
-		// console.log("Fetching of user data happening")
+	const fetchUsers = async () => {
+		const token = await getToken()
+		const result = await axios.get('/users', 
+			{
+				headers: {
+				'Authorization': `Bearer ${token}`
+				}
+			}
+		).catch(async error => 
+			{
+				if (error.response.status === 401 || error.response.status === 400) {
+					await devLogin();
+					fetchUsers();
+				}
+			}  
+		);
+		setUsers(result.data.users);
+	};
+
+
+	const makeModerator = function (userID) {
 		try { 
-			const fetchRawData = async () => {
-				const result = await axios.get('/users', 
+			const makeMod = async () => {
+				const token = await getToken()
+				const result = await axios.patch(`/users/${userID}`, 
 					{
 						headers: {
 						'Authorization': `Bearer ${token}`
+						},
+						data: {
+							'isModerator': 'MODERATOR'
 						}
 					}
-				);
-				setRawData(result.data);
+				).catch(async error => 
+          {
+            if (error.response.status === 401 || error.response.status === 400) {
+							await devLogin();
+							makeMod();
+            }
+          }  
+        );
 			};
-			fetchRawData();
+			makeMod();
+			fetchUsers();				// after successfully making moderator
+		}
+		catch {
+			console.log("ERROR: While making moderator")
+		}
+	}
+
+	
+	const deleteUser = function (userID) {
+		try { 
+			const deleteUsr = async () => {
+				const token = await getToken()
+				const result = await axios.delete(`/users/${userID}`, 
+					{
+						headers: {
+						'Authorization': `Bearer ${token}`
+						},
+					}
+				).catch(async error => 
+          {
+            if (error.response.status === 401 || error.response.status === 400) {
+							await devLogin();
+							deleteUsr();
+            }
+          }  
+        );
+			};
+			deleteUsr();
+			fetchUsers();				// after successfully making moderator
+		}
+		catch {
+			console.log("ERROR: While deleting user")
+		}
+	}
+
+
+	useEffect(() => {
+		// console.log("Fetching of user data happening")
+		try {
+			fetchUsers();
 		}
 		catch {
 			console.log("ERROR: While fetching UsersList from server")
 		}
-  }, [refinedData]);
-	
-	// NOTE - Change the value of result.data.user
-	useEffect(() => {
-		// fetch user data
-		const fetchUserData = async () => {
-			const usersList = Object.values(rawData.users);
-			for (let user of usersList) {
-				const result = await axios.get(`users/userId`, // replace this with correct call
-					{
-						headers: {
-						'Authorization': `Bearer ${token}`
-						}
-					}
-				);
-				// CHANGE this value
-				refinedData.push(result.data.user);
-			}
-		}
-
-
-		// for every user in rawData, fetch their user data using axios
-		// stored this information in refinedData object
-		if (Object.keys(rawData).length !== 0) {
-			fetchUserData();
-		}
-	}, [rawData])
-
+  }, []);
 
 	return (
 		<div className="w-full">
@@ -63,6 +102,9 @@ export default function UsersList() {
 				
 				{/* Table Head */}
 				<Table.Head>
+					<Table.HeadCell>
+						Type
+					</Table.HeadCell>
 					<Table.HeadCell>
 						User email
 					</Table.HeadCell>
@@ -79,38 +121,65 @@ export default function UsersList() {
 				{/* Table Body */}
 				<Table.Body className="divide-y">
 				{
-					refinedData.map(user => (
-						<Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-							<Table.Cell className="whitespace-nowrap text-gray-900 dark:text-white">
-								{user.email}
-							</Table.Cell>
-							<Table.Cell>
-								{user.subscriptions.map(sub => 
-									<span key={sub._id}>
-										{`${sub.apiName}, `}
-									</span>
-								)}
-							</Table.Cell>
-							<Table.Cell>
-								<div className='flex flex-row gap-2'>
-									<Button 
-										size="sm" color="light" 
-										className="border-2 border-blue-700 text-blue-700 hover:text-white hover:bg-blue-700 " 
-										onClick={user._id}
-									>
-										Edit
-									</Button>
-									<Button 
-										size="sm" color="light" 
-										className="border-2 border-red-700 text-red-700 hover:text-white hover:bg-red-700 " 
-										onClick={user._id}
-									>
-										Delete User
-									</Button>
-								</div>
-							</Table.Cell>
-						</Table.Row>
-					))
+					(() => 
+					{
+						if ((users).length == 0) {
+							return <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+								<Table.Cell className="whitespace-nowrap text-gray-900 dark:text-white">
+									No Record Found
+								</Table.Cell>
+							</Table.Row>
+						}
+						return users.map(user => (
+							<Table.Row key={user._id} className="bg-white dark:border-gray-700 dark:bg-gray-800">
+								<Table.Cell className="whitespace-nowrap text-gray-900 dark:text-white">
+									{	
+										(() => {
+											if (user.isAdmin) return 'Admin';
+											if (user.isModerator) return 'Moderator';
+											return 'User';
+										})()
+									}
+								</Table.Cell>
+								<Table.Cell className="whitespace-nowrap text-gray-900 dark:text-white">
+									{user.email}
+								</Table.Cell>
+								<Table.Cell>
+									{
+										(() => {
+											const subscriptionsName = Object.keys(user.subscriptions);
+											return subscriptionsName.length === 0 ? 'None' : subscriptionsName.join(', ');
+										})()
+									}
+								</Table.Cell>
+								<Table.Cell>
+									<div className='flex flex-row gap-2'>
+										<Button 
+											size="sm" color="light" 
+											className="border-2 border-blue-700 text-blue-700 hover:text-white hover:bg-blue-700 " 
+										>
+											Edit
+										</Button>
+										{	!user.isAdmin &&
+											<Button 
+												size="sm" color="light"
+												onClick={() => makeModerator(user._id)} 
+												className="border-2 border-orange-600 text-orange-600 hover:text-white hover:bg-orange-600 " 
+											>
+												Make Moderator
+											</Button>
+										}
+										<Button 
+											size="sm" color="light" 
+											className="border-2 border-red-700 text-red-700 hover:text-white hover:bg-red-700 " 
+										>
+											Delete User
+										</Button>
+									</div>
+								</Table.Cell>
+							</Table.Row>
+						))
+					})()
 				}
 				</Table.Body>
 			</Table>

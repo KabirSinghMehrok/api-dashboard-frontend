@@ -10,11 +10,10 @@ export default function AdminSidebar({ apiList, handleFetchApiUsers }) {
 				<Sidebar.Items>
 					<Sidebar.ItemGroup>
 						<Sidebar.Item onClick={() => handleFetchApiUsers("showUserList")}>
-							Users
+							All Users
 						</Sidebar.Item>
 						<Sidebar.Collapse
-							
-							label="API's"
+							label="Users by API"
 						>
 							{
 								apiList.map(api => (

@@ -8,7 +8,6 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-	const [currentUser, setCurrentUser] = useState()
 
 	async function login(data) {
 		const response = await axios.post('/login', JSON.stringify(data), 
@@ -22,7 +21,23 @@ export function AuthProvider({ children }) {
 		)
 
 		storeToken(response.data.token)
-		setCurrentUser({token: getToken()})
+		return response;
+	}
+
+	async function devLogin() {
+		console.log("devLogin has triggered");
+		const data = {'email': 'mansi@iiitd.ac.in', 'password': 'CoSyLab'};
+		const response = await axios.post('/login', JSON.stringify(data), 
+			{
+				headers: { 
+					'Content-Type': 'application/json', 
+					'Access-Control-Allow-Origin': '*'
+				},
+				// withCredentials: true
+			}
+		)
+
+		storeToken(response.data.token)
 		return response;
 	}
 
@@ -39,7 +54,6 @@ export function AuthProvider({ children }) {
 		)
 
 		storeToken(response.data.token)
-		setCurrentUser({token: getToken()})
 		return response;
 	}
 
@@ -50,7 +64,6 @@ export function AuthProvider({ children }) {
 	// Retrieve JWT from local storage
 	function getToken() {
 		const returnVal = localStorage.getItem("jwtToken");
-		console.log(`haiyaaa ${returnVal}`);
 		return returnVal ? returnVal : 0;
 	}
 
@@ -70,10 +83,9 @@ export function AuthProvider({ children }) {
 
 
 	let value = {
-		currentUser,
-		setCurrentUser,
 		getToken,
 		login,
+		devLogin,
 		logout,
 		signup,
 		resetPassword,
